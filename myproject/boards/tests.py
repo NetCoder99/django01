@@ -1,3 +1,6 @@
+from django.db import models
+from django.contrib.auth.models import User
+
 from django.urls import reverse, resolve
 from django.test import TestCase
 from .views import home, board_topics, new_topic
@@ -68,6 +71,7 @@ class HomeTests(TestCase):
 class NewTopicTests(TestCase):
     def setUp(self):
         Board.objects.create(name='Django', description='Django board.')
+        User.objects.create(username="test", password="test")
 
     def test_new_topic_view_success_status_code(self):
         url = reverse('new_topic', kwargs={'pk': 1})
@@ -88,6 +92,7 @@ class NewTopicTests(TestCase):
         board_topics_url = reverse('board_topics', kwargs={'pk': 1})
         response = self.client.get(new_topic_url)
         self.assertContains(response, 'href="{0}"'.format(board_topics_url))        
+
     def test_csrf(self):
         url = reverse('new_topic', kwargs={'pk': 1})
         response = self.client.get(url)
@@ -98,9 +103,9 @@ class NewTopicTests(TestCase):
         url = reverse('new_topic', kwargs={'pk': 1})
         print("++ Test:{}:Url:{}".format("test_new_topic_valid_post_data", url))
         data = {
+            'starter_id': '1',
             'subject': 'Test title',
-            'message': 'Lorem ipsum dolor sit amet',
-            'starter_id': 1
+            'message': 'Lorem ipsum dolor sit amet'
         }
         print("++ Test:{}:data:{}".format("test_new_topic_valid_post_data", data))
         response = self.client.post(url, data)

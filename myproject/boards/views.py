@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.http import Http404
 from .models import Board, Topic, Post
@@ -19,9 +20,11 @@ def board_topics(request, pk):
     except Board.DoesNotExist:
         raise Http404
 
+@login_required
 def new_topic(request, pk):
     board = get_object_or_404(Board, pk=pk)
     user = User.objects.first()  # TODO: get the currently logged in user
+
     if request.method == 'POST':
         form = NewTopicForm(request.POST)
         if form.is_valid():
